@@ -21,6 +21,7 @@ fn create_bindings() {
 fn compile_jimtcl() {
   let mut build = cc::Build::new();
   build.include("jimtcl");
+  build.include(".");
   build.define("HAVE_NO_AUTOCONF", None);
   build.flag("-Wno-unused-parameter");
   build.flag("-Wno-sign-compare");
