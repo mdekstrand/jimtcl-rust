@@ -1,3 +1,5 @@
+use std::process::exit;
+
 use jimtcl::sys;
 
 fn main() {
@@ -15,6 +17,6 @@ fn main() {
       0
     };
 
-    sys::exit(rc);
+    exit(rc)
   };
 }
