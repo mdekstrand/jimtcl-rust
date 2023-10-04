@@ -8,6 +8,8 @@ fn create_bindings() {
     .clang_arg("-Ijimtcl")
     .header("jim-wrapper.h")
     .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+    .allowlist_function("Jim_.*")
+    .allowlist_var("JIM_.*")
     .generate()
     .expect("Unable to generate bindings");
 
