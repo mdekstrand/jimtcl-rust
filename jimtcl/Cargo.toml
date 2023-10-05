@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 jimtcl-sys = { path = "../jimtcl-sys" }
 thiserror = "~1.0"
+parse-display = "0.8.2"
