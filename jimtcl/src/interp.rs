@@ -1,3 +1,4 @@
+use crate::object::Object;
 use crate::prelude::*;
 use crate::sys;
 
@@ -16,10 +17,23 @@ impl Interp {
     Ok(Interp { interp })
   }
 
+  /// Invoke the standard initialization operations.
+  pub fn std_init(&self) -> JimResult<()> {
+    self.register_core_commands();
+    self.init_static_extensions()
+  }
+
   pub fn register_core_commands(&self) {
     unsafe {
       sys::Jim_RegisterCoreCommands(self.interp);
     }
+  }
+
+  pub fn init_static_extensions(&self) -> JimResult<()> {
+    let rc = unsafe {
+      sys::Jim_InitStaticExtensions(self.interp)
+    };
+    self.require_ok(rc as u32)
   }
 
   /// Check a return code and succeed if it is OK, returning an error otherwise.
@@ -27,7 +41,10 @@ impl Interp {
     if code == sys::JIM_OK {
       Ok(())
     } else if code == sys::JIM_ERR {
-      Err(JimError::Error("evaluation error".into()))
+      let obj = unsafe {
+        Object::wrap(self, (*self.interp).result)
+      };
+      Err(JimError::Error(obj.to_string()))
     } else {
       Err(JimError::UnexpectedReturnCode(code.into()))
     }
@@ -44,6 +61,12 @@ impl Interp {
     } else {
       self.require_ok(rc)?;
       Ok(0)
+    }
+  }
+
+  pub(crate) fn free_obj(&self, obj_ptr: * mut sys::Jim_Obj) {
+    unsafe {
+      sys::Jim_FreeObj(self.interp, obj_ptr);
     }
   }
 }
